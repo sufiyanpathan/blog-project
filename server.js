@@ -18,16 +18,8 @@ const userAuth = {
   isAdmin: true,
 };
 
-app.use(express.json()); //Pass incoming payload
-// app.use((req, res, next) => {
-//   if (userAuth.isLogin && userAuth.isAdmin) {
-//     next();
-//   } else {
-//     return res.json({
-//       msg: "Invalid",
-//     });
-//   }
-// });
+app.use(express.json());
+
 //----------------Route-----------------//
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/posts", postRouter);
