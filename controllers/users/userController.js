@@ -3,7 +3,6 @@ const User = require("../../model/User/User");
 const generateToken = require("../../utils/generateToken");
 const getTokenFromHeader = require("../../utils/getTokenFromHeader");
 const appError = require("../../utils/appError");
-
 //Register
 const register = async (req, res, next) => {
   const { firstName, lastName, profilePhoto, email, password } = req.body;
@@ -83,6 +82,19 @@ const profile = async (req, res, next) => {
   }
 };
 
+//Profile photo upload
+const userProfileUpdate = async (req, res) => {
+  console.log(req.file);
+  try {
+    res.json({
+      status: "success",
+      data: "Profile photo uploaded",
+    });
+  } catch (error) {
+    res.json(error.message);
+  }
+};
+
 //All Users
 const users = async (req, res) => {
   const user = await User.find();
@@ -96,7 +108,7 @@ const users = async (req, res) => {
   }
 };
 
-//Profile
+//User delete
 const userDelete = async (req, res) => {
   try {
     res.json({
@@ -127,4 +139,5 @@ module.exports = {
   users,
   userDelete,
   userUpdate,
+  userProfileUpdate,
 };
