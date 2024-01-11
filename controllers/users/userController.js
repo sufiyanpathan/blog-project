@@ -83,15 +83,42 @@ const profile = async (req, res, next) => {
 };
 
 //Profile photo upload
-const userProfileUpdate = async (req, res) => {
-  console.log(req.file);
+const userProfileUpdate = async (req, res, next) => {
   try {
-    res.json({
-      status: "success",
-      data: "Profile photo uploaded",
-    });
+    //1. Find the user to be updated
+    const userToUpdate = await User.findById(req.userAuth);
+
+    //2. check if user found
+    if (!userToUpdate) {
+      return next(appError("User not found", 403));
+    }
+
+    //3. check if user is blocked
+    if (userToUpdate.isBlocked) {
+      return next(appError("Action not allowed, your account is blocked", 403));
+    }
+
+    //4. check if a user is updated their profile photo
+    if (req.file) {
+      //1. update profile photo
+      await User.findByIdAndUpdate(
+        req.userAuth,
+        {
+          $set: {
+            profilePhoto: req.file.path,
+          },
+        },
+        {
+          new: true,
+        }
+      );
+      res.json({
+        status: "success",
+        data: "You have successfully updated profile photo",
+      });
+    }
   } catch (error) {
-    res.json(error.message);
+    next(appError(error.message, 500));
   }
 };
 
