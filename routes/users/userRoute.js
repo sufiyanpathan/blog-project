@@ -8,6 +8,8 @@ const {
   userUpdate,
   userProfileUpdate,
   whoViewedMyProfile,
+  followingController,
+  unFollowController,
 } = require("../../controllers/users/userController");
 const isLogin = require("../../middlewares/isLogin");
 const multer = require("multer");
@@ -42,7 +44,13 @@ userRouter.post(
   userProfileUpdate
 );
 
-//POST/api/v1/users/profile-viewers/:id
+//GET/api/v1/users/profile-viewers/:id
 userRouter.get("/profile-viewers/:id", isLogin, whoViewedMyProfile);
+
+//GET/api/v1/users/following/:id
+userRouter.get("/following/:id", isLogin, followingController);
+
+//GET/api/v1/users/unfollowing/:id
+userRouter.get("/unfollowing/:id", isLogin, unFollowController);
 
 module.exports = userRouter;
