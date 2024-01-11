@@ -122,6 +122,43 @@ const userProfileUpdate = async (req, res, next) => {
   }
 };
 
+//User profile view
+const whoViewedMyProfile = async (req, res, next) => {
+  try {
+    // 1. Find the original user
+    const user = await User.findById(req.params.id);
+
+    // 2. Find the user who viewed the original
+    const userWhoViewed = await User.findById(req.userAuth);
+
+    // 3. Check if original user and who viewed are found
+
+    if (user && userWhoViewed) {
+      // 4. Check if user who viewed is already in the user viewers array
+      const isUserAlreadyViewed = user.viewers.find(
+        (viewer) => viewer.toString() === userWhoViewed._id.toJSON()
+      );
+
+      if (isUserAlreadyViewed) {
+        return next(appError("You already viewed this profile"));
+      } else {
+        // 5. Push the userWhoViewed to user's viewers array
+        user.viewers.push(userWhoViewed._id);
+
+        // 6. Save the user
+        await user.save();
+
+        res.json({
+          status: "success",
+          data: "you have successfully viewed this profile",
+        });
+      }
+    }
+  } catch (error) {
+    next(appError(error.message));
+  }
+};
+
 //All Users
 const users = async (req, res) => {
   const user = await User.find();
@@ -167,4 +204,5 @@ module.exports = {
   userDelete,
   userUpdate,
   userProfileUpdate,
+  whoViewedMyProfile,
 };

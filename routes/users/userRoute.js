@@ -7,6 +7,7 @@ const {
   userDelete,
   userUpdate,
   userProfileUpdate,
+  whoViewedMyProfile,
 } = require("../../controllers/users/userController");
 const isLogin = require("../../middlewares/isLogin");
 const multer = require("multer");
@@ -40,5 +41,8 @@ userRouter.post(
   upload.single("profile"),
   userProfileUpdate
 );
+
+//POST/api/v1/users/profile-viewers/:id
+userRouter.get("/profile-viewers/:id", isLogin, whoViewedMyProfile);
 
 module.exports = userRouter;
