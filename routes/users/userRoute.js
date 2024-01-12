@@ -10,6 +10,8 @@ const {
   whoViewedMyProfile,
   followingController,
   unFollowController,
+  blockUser,
+  unblockUser,
 } = require("../../controllers/users/userController");
 const isLogin = require("../../middlewares/isLogin");
 const multer = require("multer");
@@ -52,5 +54,11 @@ userRouter.get("/following/:id", isLogin, followingController);
 
 //GET/api/v1/users/unfollowing/:id
 userRouter.get("/unfollowing/:id", isLogin, unFollowController);
+
+//GET/api/v1/users/block-user/:id
+userRouter.get("/block-user/:id", isLogin, blockUser);
+
+//GET/api/v1/users/unblock-user/:id
+userRouter.get("/unblock-user/:id", isLogin, unblockUser);
 
 module.exports = userRouter;
