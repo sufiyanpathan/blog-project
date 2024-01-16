@@ -80,7 +80,45 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
   }
 );
+
+//Get Full name
+userSchema.virtual("fullname").get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
+
+//Get User Initials
+userSchema.virtual("initials").get(function () {
+  return `${this.firstName[0]}${this.lastName[0]}`;
+});
+
+//Get Post Counts
+userSchema.virtual("postCounts").get(function () {
+  return this.posts.length;
+});
+
+//Get followers Counts
+userSchema.virtual("followersCounts").get(function () {
+  return this.followers.length;
+});
+
+//Get FOLLOWING Counts
+userSchema.virtual("followingCounts").get(function () {
+  return this.following.length;
+});
+
+//Get Viewers Counts
+userSchema.virtual("viewersCounts").get(function () {
+  return this.viewers.length;
+});
+
+//Get Blocked Counts
+userSchema.virtual("blockedCounts").get(function () {
+  return this.blocked.length;
+});
+
+//compile the user model
 const User = mongoose.model("User", userSchema);
 module.exports = User;
