@@ -312,6 +312,58 @@ const unblockUser = async (req, res, next) => {
   }
 };
 
+//admin block
+const adminBlockUser = async (req, res, next) => {
+  try {
+    //1. FIND THE USER TO BE BLOCKED
+    const userToBeBlocked = await User.findById(req.params.id);
+
+    //2. CHECK IF USER FOUND
+    if (!userToBeBlocked) {
+      return next(appError("User Not Found"));
+    }
+
+    //3. CHANGE THE isBlocked to true
+    userToBeBlocked.isBlocked = true;
+
+    //4. Save
+    await userToBeBlocked.save();
+
+    res.json({
+      status: "success",
+      data: "you have successfully blocked the user",
+    });
+  } catch (error) {
+    res.json(error.message);
+  }
+};
+
+//admin un block
+const adminUnBlockUser = async (req, res, next) => {
+  try {
+    //1. FIND THE USER TO BE UNBLOCKED
+    const userToBeUnBlocked = await User.findById(req.params.id);
+
+    //2. CHECK IF USER FOUND
+    if (!userToBeUnBlocked) {
+      return next(appError("User Not Found"));
+    }
+
+    //3. CHANGE THE isBlocked to false
+    userToBeUnBlocked.isBlocked = false;
+
+    //4. Save
+    await userToBeUnBlocked.save();
+
+    res.json({
+      status: "success",
+      data: "you have successfully unblocked this user",
+    });
+  } catch (error) {
+    res.json(error.message);
+  }
+};
+
 //All Users
 const users = async (req, res) => {
   const user = await User.find();
@@ -362,4 +414,6 @@ module.exports = {
   unFollowController,
   blockUser,
   unblockUser,
+  adminBlockUser,
+  adminUnBlockUser,
 };

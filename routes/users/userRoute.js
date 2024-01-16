@@ -12,12 +12,14 @@ const {
   unFollowController,
   blockUser,
   unblockUser,
+  adminBlockUser,
+  adminUnBlockUser,
 } = require("../../controllers/users/userController");
 const isLogin = require("../../middlewares/isLogin");
 const multer = require("multer");
 const storage = require("../../config/cloudinary");
+const isAdmin = require("../../middlewares/isAdmin");
 const userRouter = express.Router();
-
 const upload = multer({ storage });
 
 //POST/api/v1/users/register
@@ -60,5 +62,11 @@ userRouter.get("/block-user/:id", isLogin, blockUser);
 
 //GET/api/v1/users/unblock-user/:id
 userRouter.get("/unblock-user/:id", isLogin, unblockUser);
+
+//PUT/api/v1/users/admin-block-user/:id
+userRouter.put("/admin-block-user/:id", isLogin, isAdmin, adminBlockUser);
+
+//PUT/api/v1/users/admin-unblock-user/:id
+userRouter.put("/admin-unblock-user/:id", isLogin, isAdmin, adminUnBlockUser);
 
 module.exports = userRouter;
