@@ -1,11 +1,14 @@
 const bcrypt = require("bcryptjs");
 const User = require("../../model/User/User");
+const Post = require("../../model/Post/Post");
+const Comment = require("../../model/Comment/Comment");
+const Category = require("../../model/Category/Category");
 const generateToken = require("../../utils/generateToken");
 const getTokenFromHeader = require("../../utils/getTokenFromHeader");
 const appError = require("../../utils/appError");
 //Register
 const register = async (req, res, next) => {
-  const { firstName, lastName, profilePhoto, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
   try {
     //check if email exists
     const userFound = await User.findOne({ email });
@@ -20,7 +23,6 @@ const register = async (req, res, next) => {
     const user = await User.create({
       firstName,
       lastName,
-      profilePhoto,
       email,
       password: hashedPassword,
     });
@@ -334,7 +336,7 @@ const adminBlockUser = async (req, res, next) => {
       data: "you have successfully blocked the user",
     });
   } catch (error) {
-    res.json(error.message);
+    next(appError(error.message));
   }
 };
 
@@ -360,7 +362,71 @@ const adminUnBlockUser = async (req, res, next) => {
       data: "you have successfully unblocked this user",
     });
   } catch (error) {
-    res.json(error.message);
+    next(appError(error.message));
+  }
+};
+
+//Updating user
+const userUpdate = async (req, res, next) => {
+  const { email, lastName, firstName } = req.body;
+  try {
+    // check if email not taken
+    if (email) {
+      const emailTaken = await User.findOne({ email });
+
+      if (emailTaken) {
+        return next(appError("Email is taken", 400));
+      }
+    }
+    // update the user
+    const user = await User.findByIdAndUpdate(
+      req.userAuth,
+      {
+        lastName,
+        firstName,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.json({
+      status: "success",
+      data: user,
+    });
+  } catch (error) {
+    next(appError(error.message));
+  }
+};
+
+//update password
+const updatePassword = async (req, res, next) => {
+  const { password } = req.body;
+  try {
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      await User.findByIdAndUpdate(
+        req.userAuth,
+        {
+          password: hashedPassword,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      res.json({
+        status: "success",
+        data: "Password has been changed ! Successfully",
+      });
+    } else {
+      return next(appError("Please provide password field"));
+    }
+  } catch (error) {
+    next(appError(error.message));
   }
 };
 
@@ -373,31 +439,32 @@ const users = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    res.json(error.message);
+    next(appError(error.message));
   }
 };
 
 //User delete
-const userDelete = async (req, res) => {
+const userDelete = async (req, res, next) => {
   try {
-    res.json({
-      status: "success",
-      data: "single user deleted successfully",
-    });
-  } catch (error) {
-    res.json(error.message);
-  }
-};
+    const userToDelete = await User.findById(req.userAuth);
+    if (userToDelete) {
+      await Post.deleteMany({ user: req.userAuth });
 
-//Update User
-const userUpdate = async (req, res) => {
-  try {
-    res.json({
-      status: "success",
-      data: "single user updated successfully",
-    });
+      await Comment.deleteMany({ user: req.userAuth });
+
+      await Category.deleteMany({ user: req.userAuth });
+
+      await userToDelete.deleteOne();
+
+      return res.json({
+        status: "success",
+        data: "Your account has been deleted successfully",
+      });
+    } else {
+      next(appError("No user found"));
+    }
   } catch (error) {
-    res.json(error.message);
+    next(appError(error.message));
   }
 };
 
@@ -416,4 +483,5 @@ module.exports = {
   unblockUser,
   adminBlockUser,
   adminUnBlockUser,
+  updatePassword,
 };

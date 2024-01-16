@@ -14,6 +14,7 @@ const {
   unblockUser,
   adminBlockUser,
   adminUnBlockUser,
+  updatePassword,
 } = require("../../controllers/users/userController");
 const isLogin = require("../../middlewares/isLogin");
 const multer = require("multer");
@@ -35,10 +36,10 @@ userRouter.get("/profile/", isLogin, profile);
 userRouter.get("/", users);
 
 //Del/api/v1/users/:id
-userRouter.delete("/:id", userDelete);
+userRouter.delete("/", isLogin, userDelete);
 
-//Update/api/v1/users/:id
-userRouter.put("/:id", userUpdate);
+//Update/api/v1/users
+userRouter.put("/", isLogin, userUpdate);
 
 //POST/api/v1/users/profile-photo-upload
 userRouter.post(
@@ -68,5 +69,8 @@ userRouter.put("/admin-block-user/:id", isLogin, isAdmin, adminBlockUser);
 
 //PUT/api/v1/users/admin-unblock-user/:id
 userRouter.put("/admin-unblock-user/:id", isLogin, isAdmin, adminUnBlockUser);
+
+//PUT/api/v1/users/update-password/:id
+userRouter.put("/update-password", isLogin, updatePassword);
 
 module.exports = userRouter;

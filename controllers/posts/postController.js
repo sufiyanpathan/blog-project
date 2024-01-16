@@ -23,7 +23,7 @@ const createPost = async (req, res) => {
       data: postCreated,
     });
   } catch (error) {
-    res.json(error.message);
+    next(appError(error.message));
   }
 };
 
