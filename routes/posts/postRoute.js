@@ -6,11 +6,12 @@ const {
   deletePost,
   updatePost,
 } = require("../../controllers/posts/postController");
+const isLogin = require("../../middlewares/isLogin");
 
 const postRouter = express.Router();
 
 //POST/api/v1/posts/register
-postRouter.post("/", createPost);
+postRouter.post("/", isLogin, createPost);
 
 //GET/api/v1/posts/:id
 postRouter.get("/:id", getPost);
